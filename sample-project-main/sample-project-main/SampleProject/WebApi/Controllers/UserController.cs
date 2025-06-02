@@ -28,14 +28,23 @@ namespace WebApi.Controllers
         [HttpPost]
         public HttpResponseMessage CreateUser(Guid userId, [FromBody] UserModel model)
         {
-            var user = _createUserService.Create(userId, model.Name, model.Email, model.Type, model.AnnualSalary, model.Tags);
-            return Found(new UserData(user));
+            var user = _getUserService.GetUser(userId);
+            if (user != null)
+            {
+                return Conflict();
+            }
+            var newuser = _createUserService.Create(userId, model.Name, model.Email, model.Type, model.AnnualSalary, model.Tags);
+            return Found(new UserData(newuser));
         }
 
         [Route("{userId:guid}/update")]
-        [HttpPost]
+        [HttpPut]
         public HttpResponseMessage UpdateUser(Guid userId, [FromBody] UserModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateErrorResponse(System.Net.HttpStatusCode.BadRequest, ModelState);               
+            }
             var user = _getUserService.GetUser(userId);
             if (user == null)
             {
@@ -89,7 +98,16 @@ namespace WebApi.Controllers
         [HttpGet]
         public HttpResponseMessage GetUsersByTag(string tag)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(tag))
+            {
+                return Request.CreateErrorResponse(System.Net.HttpStatusCode.BadRequest, "Tag is required.");
+            }
+
+            var users = _getUserService.GetUsersByTag(tag)
+                                       .Select(u => new UserData(u))
+                                       .ToList();
+
+            return Found(users);
         }
     }
 }

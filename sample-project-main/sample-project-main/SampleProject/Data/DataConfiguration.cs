@@ -35,7 +35,7 @@ namespace Data
         {
             var documentStore = new DocumentStore
                                 {
-                                    Url = "http://localhost:8080/",
+                                    Url = "http://yash:8080/",
                                     DefaultDatabase = "SampleProject",
                                     Conventions =
                                     {

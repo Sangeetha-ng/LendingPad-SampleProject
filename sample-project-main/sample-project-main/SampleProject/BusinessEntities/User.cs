@@ -19,6 +19,7 @@ namespace BusinessEntities
             private set => _email = value;
         }
 
+        
         public string Name
         {
             get => _name;
